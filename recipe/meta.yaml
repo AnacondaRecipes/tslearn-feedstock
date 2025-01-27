@@ -19,12 +19,12 @@ requirements:
   build:
     - python
     - numpy
-    - setuptools
-    - wheel
   host:
     - python
     - pip
     - numpy {{ numpy }}
+    - setuptools
+    - wheel
   run:
     - python
     - {{ pin_compatible('numpy') }}
