@@ -12,7 +12,7 @@ source:
 
 build:
   number: 0
-  skip: true  # [py>311 or s390x]
+  skip: true  # [s390x]
   script: {{ PYTHON }} -m pip install . --no-deps -vv --no-build-isolation
 
 requirements:
@@ -54,6 +54,7 @@ test:
     - h5py
   commands:
     - pip check
+    # skipping tensorflow required tests, due to not having tensorflow.keras requirement
     - pytest -vv tslearn/tests {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
 
 about:
