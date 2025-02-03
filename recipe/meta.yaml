@@ -16,18 +16,16 @@ build:
   script: {{ PYTHON }} -m pip install . --no-deps -vv --no-build-isolation
 
 requirements:
-  build:
-    - python
-    - numpy
   host:
     - python
     - pip
-    - numpy {{ numpy }}
+    - numpy 2.0 # [py<313]
+    - numpy 2.1 # [py>=313]
     - setuptools
     - wheel
   run:
     - python
-    - {{ pin_compatible('numpy') }}
+    - numpy
     - scipy
     - scikit-learn
     - numba
