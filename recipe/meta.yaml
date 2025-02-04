@@ -30,6 +30,9 @@ requirements:
     - scikit-learn
     - numba
     - joblib
+  run_constrained:
+    # tslearn's current keras is not compatible with recent tensorflow (keras 2 vs keras 3)
+    - tensorflow >=2.0,<2.16
 
 {% set pytest_ignore = '--ignore="tslearn/tests/test_estimators.py"' %}
 {% set pytest_ignore = pytest_ignore + ' --ignore="tslearn/tests/test_serialize_models.py"' %}
@@ -38,7 +41,6 @@ requirements:
 {% set pytest_skip = pytest_skip + " or test_shapelets" %}
 {% set pytest_skip = pytest_skip + " or test_shapelet_lengths" %}
 {% set pytest_skip = pytest_skip + " or test_series_lengths" %}
-
 
 test:
   source_files:
@@ -52,7 +54,7 @@ test:
     - h5py
   commands:
     - pip check
-    # skipping tensorflow required tests, due to not having tensorflow.keras requirement
+    # skipping tensorflow tests due to old tensorflow requirements
     - pytest -vv tslearn/tests {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
 
 about:
