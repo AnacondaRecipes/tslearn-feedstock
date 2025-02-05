@@ -48,6 +48,23 @@ test:
   imports:
     - tslearn
     - tslearn.metrics
+    - tslearn.backend
+    - tslearn.barycenters
+    - tslearn.bases
+    - tslearn.clustering
+    - tslearn.datasets
+    - tslearn.early_classification
+    - tslearn.generators
+    - tslearn.hdftools
+    - tslearn.matrix_profile
+    - tslearn.neighbors
+    - tslearn.neural_network
+    - tslearn.piecewise
+    - tslearn.preprocessing
+    # requires tensorflow and keras
+    #- tslearn.shapelets
+    - tslearn.svm
+    - tslearn.utils
   requires:
     - pip
     - pytest
