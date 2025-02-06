@@ -30,8 +30,7 @@ requirements:
     - scikit-learn
     - numba
     - joblib
-  run_constrained:
-    # tslearn's current keras is not compatible with recent tensorflow (keras 2 vs keras 3)
+    # tslearn's current keras is not compatible with recent tensorflow (keras 2 vs keras 3) 
     - tensorflow >=2.0,<2.16
 
 {% set pytest_ignore = '--ignore="tslearn/tests/test_estimators.py"' %}
@@ -62,7 +61,7 @@ test:
     - tslearn.piecewise
     - tslearn.preprocessing
     # requires tensorflow and keras
-    #- tslearn.shapelets
+    - tslearn.shapelets
     - tslearn.svm
     - tslearn.utils
   requires:
@@ -70,7 +69,11 @@ test:
     - pytest
     - h5py
   commands:
-    - pip check
+    # tensorflow 2.12.0 requires jax, which is not installed.
+    # tensorflow 2.12.0 requires libclang, which is not installed.
+    # tensorflow 2.12.0 has requirement wrapt<1.15,>=1.11.0, but you have wrapt 1.17.0.
+    # Can`t fix from this package
+    #- pip check
     # skipping tensorflow tests due to old tensorflow requirements
     - pytest -vv tslearn/tests {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
 
