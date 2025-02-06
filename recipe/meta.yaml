@@ -12,7 +12,12 @@ source:
 
 build:
   number: 0
-  skip: true  # [py>311 or s390x]
+  # On s390x tensorflow  does not exist (perhaps a typo or a missing channel).
+  skip: True  # [s390x]
+  # tensorflow and keros compatible versions is not avaliable from py312
+  skip: True  # [py>311]
+  # tensorflow on windows is avaliable only form py37 to py310
+  skip: True  # [win and py>310]
   script: {{ PYTHON }} -m pip install . --no-deps -vv --no-build-isolation
 
 requirements:
