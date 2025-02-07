@@ -1,6 +1,5 @@
 {% set name = "tslearn" %}
-{% set version = "0.5.3.2" %}
-{% set sha256 = "acf4015b07207ad6a645ddcc8eec04d8431716b24db66a745ab29fa22f772820" %}
+{% set version = "0.6.3" %}
 
 
 package:
@@ -8,39 +7,80 @@ package:
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  sha256: c855c0b784b42dc4c50f4eaf524ec7ed658037e86fc14af38ca3b66c75dd6adb
 
 build:
   number: 0
-  skip: true  # [py2k]
-  script: {{ PYTHON }} -m pip install . --no-deps -vv
+  # On s390x tensorflow  does not exist (perhaps a typo or a missing channel).
+  skip: True  # [s390x]
+  # tensorflow and keros compatible versions is not avaliable from py312
+  skip: True  # [py>311]
+  # tensorflow on windows is avaliable only form py37 to py310
+  skip: True  # [win and py>310]
+  script: {{ PYTHON }} -m pip install . --no-deps -vv --no-build-isolation
 
 requirements:
-  build:
-    - python                                 # [build_platform != target_platform]
-    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-    - cython                                 # [build_platform != target_platform]
-    - numpy                                  # [build_platform != target_platform]
-    - {{ compiler('c') }}
   host:
     - python
     - pip
-    - cython
-    - numpy
+    - numpy 2.0 # [py<313]
+    - numpy 2.1 # [py>=313]
+    - setuptools
+    - wheel
   run:
     - python
-    - {{ pin_compatible('numpy') }}
+    - numpy
     - scipy
     - scikit-learn
     - numba
     - joblib
+    # tslearn's current keras is not compatible with recent tensorflow (keras 2 vs keras 3) 
+    - tensorflow >=2.0,<2.16
+
+{% set pytest_ignore = '--ignore="tslearn/tests/test_estimators.py"' %}
+{% set pytest_ignore = pytest_ignore + ' --ignore="tslearn/tests/test_serialize_models.py"' %}
+
+{% set pytest_skip = "test_masks" %}
+{% set pytest_skip = pytest_skip + " or test_shapelets" %}
+{% set pytest_skip = pytest_skip + " or test_shapelet_lengths" %}
+{% set pytest_skip = pytest_skip + " or test_series_lengths" %}
 
 test:
+  source_files:
+    - tslearn/tests
   imports:
     - tslearn
     - tslearn.metrics
+    - tslearn.backend
+    - tslearn.barycenters
+    - tslearn.bases
+    - tslearn.clustering
+    - tslearn.datasets
+    - tslearn.early_classification
+    - tslearn.generators
+    - tslearn.hdftools
+    - tslearn.matrix_profile
+    - tslearn.neighbors
+    - tslearn.neural_network
+    - tslearn.piecewise
+    - tslearn.preprocessing
+    # requires tensorflow and keras
+    - tslearn.shapelets
+    - tslearn.svm
+    - tslearn.utils
+  requires:
+    - pip
+    - pytest
+    - h5py
+  commands:
+    # tensorflow 2.12.0 requires jax, which is not installed.
+    # tensorflow 2.12.0 requires libclang, which is not installed.
+    # tensorflow 2.12.0 has requirement wrapt<1.15,>=1.11.0, but you have wrapt 1.17.0.
+    # Can`t fix from this package
+    #- pip check
+    # skipping tensorflow tests due to old tensorflow requirements
+    - pytest -vv tslearn/tests {{ pytest_ignore }} -k "not ({{ pytest_skip }})"
 
 about:
   home: http://tslearn.readthedocs.io/
